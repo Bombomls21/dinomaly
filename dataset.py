@@ -72,6 +72,7 @@ class MVTecDataset(torch.utils.data.Dataset):
             if defect_type == 'good':
                 img_paths = glob.glob(os.path.join(self.img_path, defect_type) + "/*.png") + \
                             glob.glob(os.path.join(self.img_path, defect_type) + "/*.JPG") + \
+                            glob.glob(os.path.join(self.img_path, defect_type) + "/*.jpg") + \
                             glob.glob(os.path.join(self.img_path, defect_type) + "/*.bmp")
                 img_tot_paths.extend(img_paths)
                 gt_tot_paths.extend([0] * len(img_paths))
@@ -80,6 +81,7 @@ class MVTecDataset(torch.utils.data.Dataset):
             else:
                 img_paths = glob.glob(os.path.join(self.img_path, defect_type) + "/*.png") + \
                             glob.glob(os.path.join(self.img_path, defect_type) + "/*.JPG") + \
+                            glob.glob(os.path.join(self.img_path, defect_type) + "/*.jpg") + \
                             glob.glob(os.path.join(self.img_path, defect_type) + "/*.bmp")
                 gt_paths = glob.glob(os.path.join(self.gt_path, defect_type) + "/*.png")
                 img_paths.sort()
@@ -89,7 +91,10 @@ class MVTecDataset(torch.utils.data.Dataset):
                 tot_labels.extend([1] * len(img_paths))
                 tot_types.extend([defect_type] * len(img_paths))
 
-        assert len(img_tot_paths) == len(gt_tot_paths), "Something wrong with test and ground truth pair!"
+        gt_defect_paths = [p for p in gt_tot_paths if p != 0]
+        img_defect_paths = [p for p in img_tot_paths if '/good/' not in p]
+        assert len(img_defect_paths) == len(gt_defect_paths), \
+            f"Mismatch:  {len(img_defect_paths)} defect images vs {len(gt_defect_paths)} ground truth masks"
 
         return np.array(img_tot_paths), np.array(gt_tot_paths), np.array(tot_labels), np.array(tot_types)
 
@@ -202,7 +207,9 @@ class LOCODataset(torch.utils.data.Dataset):
                 tot_labels.extend([1] * len(img_paths))
                 tot_types.extend([defect_type] * len(img_paths))
 
-        assert len(img_tot_paths) == len(gt_tot_paths), "Something wrong with test and ground truth pair!"
+        img_defect_paths = [p for p in img_tot_paths if '/good/' not in p]
+        assert len(img_defect_paths) == len(gt_tot_paths), \
+            f"Mismatch:  {len(img_defect_paths)} defect images vs {len(gt_tot_paths)} ground truth masks"
 
         return img_tot_paths, gt_tot_paths, tot_labels, tot_types
 
@@ -317,7 +324,9 @@ class AeBADDataset(torch.utils.data.Dataset):
                     tot_labels.extend([1] * len(img_paths))
                     tot_types.extend([defect_type] * len(img_paths))
 
-        assert len(img_tot_paths) == len(gt_tot_paths), "Something wrong with test and ground truth pair!"
+        img_defect_paths = [p for p in img_tot_paths if '/good/' not in p]
+        assert len(img_defect_paths) == len(gt_tot_paths), \
+            f"Mismatch:  {len(img_defect_paths)} defect images vs {len(gt_tot_paths)} ground truth masks"
 
         return img_tot_paths, gt_tot_paths, tot_labels, tot_types
 
@@ -546,7 +555,9 @@ class MVTecSimplexDataset(torch.utils.data.Dataset):
                 tot_labels.extend([1] * len(img_paths))
                 tot_types.extend([defect_type] * len(img_paths))
 
-        assert len(img_tot_paths) == len(gt_tot_paths), "Something wrong with test and ground truth pair!"
+        img_defect_paths = [p for p in img_tot_paths if '/good/' not in p]
+        assert len(img_defect_paths) == len(gt_tot_paths), \
+            f"Mismatch:  {len(img_defect_paths)} defect images vs {len(gt_tot_paths)} ground truth masks"
 
         return img_tot_paths, gt_tot_paths, tot_labels, tot_types
 
